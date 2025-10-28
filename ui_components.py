@@ -61,3 +61,32 @@ def job_desc_ui():
  
     if col_back_next[1].button("Analyze ▶️", use_container_width=True):
         if not st.session_state.resume_filename and not st.session_state.job_desc:
+          st.warning("⚠️ Please upload a resume and enter a job description before analyzing.")
+        elif not st.session_state.resume_filename:
+            st.warning("📄 Resume is missing. Please upload your PDF on the Upload tab.")
+        elif not st.session_state.job_desc:
+            st.warning("💼 Job description is missing. Please paste it on this tab.")
+        else:
+            st.session_state.step = "processing"
+            st.rerun()
+ 
+def results_placeholder_ui():
+    st.write("Results will appear after running an analysis.")
+    st.button("Go to Upload", on_click=lambda: st.session_state.update({"step": "input"}) or st.rerun())
+ 
+def interview_prep_ui():
+    st.markdown("### 🏆 Interview Preparation & Skill Gaps")
+ 
+    if not st.session_state.report:
+        st.info("Run an analysis first to generate AI insights for interview questions and knowledge gaps.")
+    else:
+        if not st.session_state.interview_advice:
+            with st.spinner("Generating interview questions and knowledge gaps..."):
+                st.session_state.interview_advice = generate_interview_advice(st.session_state.resume_text, st.session_state.job_desc)
+ 
+        st.markdown(
+            f"""<div style="background:#f9f9ff;padding:16px;border-radius:10px;border:1px solid #dfe3f0;max-height:500px;overflow:auto;white-space:pre-wrap;">
+{st.session_state.interview_advice}
+</div>""",
+            unsafe_allow_html=True
+        )
